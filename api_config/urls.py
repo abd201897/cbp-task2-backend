@@ -1,5 +1,5 @@
 """
-URL configuration for api_config project.
+URL configuration for backend project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -16,16 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import (
-    TokenObtainSlidingView,
-    TokenRefreshSlidingView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 
-# This is test
+from accounts.serializers import JWTTokenView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
     path('api/courses/', include('courses.urls')),
-    path('token/', TokenObtainSlidingView.as_view(), name='token_obtain'),
-    path('token/refresh/', TokenRefreshSlidingView.as_view(), name='token_refresh'),
+    path('login/', JWTTokenView.as_view(), name='token_obtain'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('logout', TokenBlacklistView.as_view(), name='token_refresh'),
 ]
