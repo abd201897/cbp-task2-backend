@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config, Csv
 from datetime import timedelta
+import os
 
 from django.conf import settings
 
@@ -24,13 +24,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', cast=str)
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', cast=bool)
+DEBUG = os.environ['DEBUG']
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+WEBSITE_HOSTNAME = os.environ['WEBSITE_HOSTNAME']
 
+if DEBUG: 
+    ALLOWED_HOSTS = ['*'] 
+
+else: 
+
+    ALLOWED_HOSTS = [WEBSITE_HOSTNAME] 
+
+    CSRF_TRUSTED_ORIGINS = [f'https://{WEBSITE_HOSTNAME}'] 
 
 # Application definition
 
@@ -95,11 +103,11 @@ WSGI_APPLICATION = 'api_config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('MYSQL_DB', cast=str),
-        'USER': config('MYSQL_USER', cast=str),
-        'PASSWORD': config('MYSQL_PASS', cast=str),
-        'HOST': config('MYSQL_HOST', cast=str),
-        'PORT': config('MYSQL_PORT', cast=str)
+        'NAME': os.environ['MYSQL_DB'],
+        'USER': os.environ['MYSQL_USER'],
+        'PASSWORD': os.environ['MYSQL_PASS'],
+        'HOST': os.environ['MYSQL_HOST'],
+        'PORT': os.environ['MYSQL_PORT'],
     }
 }
 
