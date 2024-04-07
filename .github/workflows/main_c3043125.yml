@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+      - user/abdullah
+      - user/hamza
+      - user/jigar
+      - user/ehsan
+      - user/pinal
   workflow_dispatch:
 
 jobs:

@@ -24,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ['DEBUG']
+DEBUG = os.environ.get('DEBUG')
 
-WEBSITE_HOSTNAME = os.environ['WEBSITE_HOSTNAME']
+WEBSITE_HOSTNAME = os.environ.get('WEBSITE_HOSTNAME','*')
 
 if DEBUG: 
     ALLOWED_HOSTS = ['*'] 
@@ -103,11 +103,11 @@ WSGI_APPLICATION = 'api_config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['MYSQL_DB'],
-        'USER': os.environ['MYSQL_USER'],
-        'PASSWORD': os.environ['MYSQL_PASS'],
-        'HOST': os.environ['MYSQL_HOST'],
-        'PORT': os.environ['MYSQL_PORT'],
+        'NAME': os.environ.get('MYSQL_DB'),
+        'USER': os.environ.get('MYSQL_USER'),
+        'PASSWORD': os.environ.get('MYSQL_PASS'),
+        'HOST': os.environ.get('MYSQL_HOST'),
+        'PORT': os.environ.get('MYSQL_PORT'),
     }
 }
 
