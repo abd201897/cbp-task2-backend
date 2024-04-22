@@ -1,5 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from utils.utils import get_code
+
+UserModel = get_user_model()
+
 # Create your models here.
 
 
@@ -49,3 +53,17 @@ class Course(models.Model):
 
     def __str__(self):
         return f"{self.code} - {self.name}"
+
+
+class StudentModuleRegistration(models.Model):
+    student = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='registrations')
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='registrations')
+    registration_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.username} registered for {self.module.name} on {self.registration_date}"
+
+    class Meta:
+        db_table = 'StudentModuleRegistration'
+        unique_together = ('student', 'module')
+        ordering = ['-registration_date']
