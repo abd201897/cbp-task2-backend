@@ -1,12 +1,15 @@
+import json
+
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from courses.models import Course, Module
-from courses.serializers import CourseSerializer, ModuleSerializer
+from courses.models import Course, Module, StudentModuleRegistration
+from courses.serializers import CourseSerializer, ModuleSerializer, StudentModuleRegistrationSerializer
 from utils.handlers.request_handlers import DRHandler
 
 DR_handler = DRHandler()
+
 
 # Create your views here.
 
@@ -59,3 +62,72 @@ def get_module_detail(request):
         return Response(data={
             'message': str(ex)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@DR_handler.authenticate_rest_call(allowed_methods=['GET'])
+def get_student_module_register(request):
+    serialize = None
+    if request.user.role.name == 'STUDENT':
+        try:
+            student_module_regis = StudentModuleRegistration.objects.filter(student=request.user)
+            serialize = StudentModuleRegistrationSerializer(student_module_regis, many=True)
+            return Response(data=serialize.data)
+        except Exception as ex:
+            message = str(serialize.errors) if serialize else str(ex)
+            return Response(data={
+                'message': message
+            }, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(data={
+            'message': 'Unauthorized access!'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@DR_handler.authenticate_rest_call(allowed_methods=['POST'])
+def student_module_register(request):
+    user = request.user
+    data = json.loads(request.body)
+    serializer_ = None
+    if user.role.name == 'STUDENT':
+        try:
+            serializer_ = StudentModuleRegistrationSerializer(data=data, many=False)
+            if serializer_.is_valid(raise_exception=True):
+                serializer_.save()
+                module_model = Module.objects.get(id=serializer_.data.get('module', None)).name
+                return Response(data={
+                    'message': f'Enrolled for {Module.objects.get(id=serializer_.data.get("module", None))}.'
+                })
+        except Exception as ex:
+            message = str(serializer_.errors) if serializer_ else str(ex)
+            return Response(data={
+                'message': message
+            }, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(data={
+            'message': 'Unauthorized access!'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@DR_handler.authenticate_rest_call(allowed_methods=['POST'])
+def student_module_unregister(request):
+    user = request.user
+    id = request.GET.get('id', None)
+    serializer_ = None
+    if user.role.name == 'STUDENT' and type(int(id)) == int:
+        try:
+            student_register_ = StudentModuleRegistration.objects.filter(id=id)
+            if student_register_:
+                student_register_.delete()
+                # module_model = Module.objects.get(id=serializer_.data.get('module', None)).name
+                return Response(data={
+                    'message': f'Enrolled from module.'
+                })
+        except Exception as ex:
+            message = str(serializer_.errors) if serializer_ else str(ex)
+            return Response(data={
+                'message': message
+            }, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(data={
+            'message': 'Unauthorized access!'
+        }, status=status.HTTP_401_UNAUTHORIZED)
