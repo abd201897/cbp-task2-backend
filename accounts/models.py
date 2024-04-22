@@ -8,10 +8,10 @@ from utils.models import Roles
 
 class User(AbstractUser):
     role = models.ForeignKey(Roles, default=None, null=True, on_delete=models.SET_NULL)
-    date_of_birth = models.BigIntegerField(default=None, null=False, verbose_name='Date Of Birth')
-    address = models.TextField(default='', null=False, verbose_name='Address')
-    city = models.CharField(max_length=100, default='', null=False, verbose_name='City')
-    country = models.CharField(max_length=100, default='', null=False, verbose_name='Country')
+    date_of_birth = models.BigIntegerField(default=None, null=True, verbose_name='Date Of Birth')
+    address = models.TextField(default='', null=True, verbose_name='Address')
+    city = models.CharField(max_length=100, default='', null=True, verbose_name='City')
+    country = models.CharField(max_length=100, default='', null=True, verbose_name='Country')
     image = models.TextField(default='', verbose_name='Profile Picture URL')
 
     def __str__(self):
