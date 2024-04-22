@@ -38,7 +38,7 @@ def add_user(request):
     }, status=HTTP_400_BAD_REQUEST)
 
 
-@DR_handler.authenticate_rest_call(allowed_methods=['POST'])
+@DR_handler.authenticate_rest_call(allowed_methods=['GET'])
 def get_user(request):
     user_id = request.GET.get('user_id', None)
 
