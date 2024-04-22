@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
     path('api/courses/', include('courses.urls')),
-    path('login/', JWTTokenView.as_view(), name='token_obtain'),
+    path('login', JWTTokenView.as_view(), name='token_obtain'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('logout', TokenBlacklistView.as_view(), name='token_refresh'),
 ]
