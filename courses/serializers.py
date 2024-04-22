@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Module, Course
+from .models import Module, Course, StudentModuleRegistration
 
 
 class ModuleSerializer(serializers.ModelSerializer):
@@ -56,3 +56,22 @@ class CourseSerializer(serializers.ModelSerializer):
             module.delete()
 
         return instance
+
+
+class StudentModuleRegistrationSerializer(serializers.ModelSerializer):
+    # modules = ModuleSerializer(many=True, read_only=True)
+    modules = serializers.SerializerMethodField('get_modules', allow_null=False, read_only=True)
+
+    def get_modules(self, obj):
+        if hasattr(obj, 'module'):
+            module_ = Module.objects.get(id=obj.module.id)
+            module_serializer = ModuleSerializer(module_)
+            return module_serializer.data
+        return []
+
+    class Meta:
+        model = StudentModuleRegistration
+        fields = ['id', 'student', 'module', 'modules']
+        extra_kwargs = {
+            'student': {'write_only': True},
+        }
