@@ -14,7 +14,6 @@ from pathlib import Path
 from datetime import timedelta
 
 from corsheaders.defaults import default_headers
-from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG')
 
-WEBSITE_HOSTNAME = os.environ.get('WEBSITE_HOSTNAME','*')
+WEBSITE_HOSTNAME = os.environ.get('WEBSITE_HOSTNAME', '*')
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
@@ -41,12 +40,14 @@ else:
     CSRF_TRUSTED_ORIGINS = [f'https://{WEBSITE_HOSTNAME}']
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-AZURE_BLOB_URL = os.environ['AZURE_BLOB_URL']
-CORS_ALLOWED_ORIGINS = ['http://localhost:5173', 'https://localhost:5173', 'http://127.0.0.1:5173', 'https://127.0.0.1:5173']
-CORS_ORIGIN_WHITELIST = ['http://localhost:5173', 'https://localhost:5173', 'http://127.0.0.1:5173', 'https://127.0.0.1:5173']
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = list(default_headers)
+
+# Acure Blob Access Keys
+AZURE_BLOB_KEY = os.environ['AZURE_BLOB_KEY']
+AZURE_BLOB_STORAGE_ACCOUNT = os.environ['AZURE_BLOB_STORAGE_ACCOUNT']
+AZURE_BLOB_CONTAINER_NAME = os.environ['AZURE_BLOB_CONTAINER_NAME']
 
 # Application definition
 
@@ -67,7 +68,8 @@ CUSTOM_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework_simplejwt.token_blacklist',
-    'corsheaders'
+    'corsheaders',
+    'django_extensions'
 ]
 
 INSTALLED_APPS = CORE_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
@@ -152,7 +154,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,

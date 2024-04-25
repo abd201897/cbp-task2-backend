@@ -1,14 +1,11 @@
 import base64
-import imghdr
 import os.path
 
 from django.conf import settings
-from django.contrib.auth.hashers import make_password
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-
 
 User_Model = get_user_model()
 
@@ -39,7 +36,7 @@ class UserSerializers(ModelSerializer):
 
     def update(self, instance, validated_data):
         instance = super(UserSerializers, self).update(instance, validated_data)
-        instance.email = validated_data.get('first_name')
+        instance.email = validated_data.get('email')
         instance.first_name = validated_data.get('first_name')
         instance.last_name = validated_data.get('last_name')
         instance.date_of_birth = validated_data.get('date_of_birth')
@@ -49,8 +46,10 @@ class UserSerializers(ModelSerializer):
         if 'password' in validated_data:
             instance.set_password(validated_data['password'])
 
-        if validated_data['is_image_uploaded']:
-            instance.image = os.path.join(settings.AZURE_BLOB_URL, instance.username + "_" + str(instance.id) + '.' + validated_data['image_type'])
+        # if validated_data['is_image_uploaded']:
+        #     instance.image = os.path.join(settings.AZURE_BLOB_URL,
+        #                                   instance.username + "_" + str(instance.id) + '.' + validated_data[
+        #                                       'image_type'])
         instance.save()
         return instance
 
@@ -67,9 +66,11 @@ class UserSerializers(ModelSerializer):
 
         return attrs
 
-
-
     class Meta:
         model = User_Model
         fields = '__all__'
-
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'user_permissions': {'write_only': True},
+            'groups': {'write_only': True}
+        }
