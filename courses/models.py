@@ -21,7 +21,7 @@ class Module(models.Model):
     ]
 
     name = models.CharField(max_length=255, verbose_name='Name of the module')
-    code = models.CharField(max_length=50, unique=True, verbose_name='Code')
+    code = models.CharField(max_length=255, unique=True, verbose_name='Code')
     credit = models.IntegerField(verbose_name='Credit')
     category = models.CharField(max_length=100, verbose_name='Category')
     description = models.TextField(verbose_name='Description')
@@ -48,7 +48,7 @@ class Course(models.Model):
     Represents a course that can have multiple modules offered.
     """
     name = models.CharField(max_length=255, verbose_name='Name of the course')
-    code = models.CharField(max_length=50, unique=True, verbose_name='Code')
+    code = models.CharField(max_length=255, unique=True, verbose_name='Code')
     description = models.TextField(verbose_name='Description')
 
     def __str__(self):
