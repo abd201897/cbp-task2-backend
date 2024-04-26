@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-
+from decouple import config, Csv
 from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY', cast=str)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = config('DEBUG', cast=bool)
 
-WEBSITE_HOSTNAME = os.environ.get('WEBSITE_HOSTNAME', '*')
+WEBSITE_HOSTNAME = config('WEBSITE_HOSTNAME', default='*', cast=Csv())
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
@@ -114,11 +114,11 @@ WSGI_APPLICATION = 'api_config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQL_DB'),
-        'USER': os.environ.get('MYSQL_USER'),
-        'PASSWORD': os.environ.get('MYSQL_PASS'),
-        'HOST': os.environ.get('MYSQL_HOST'),
-        'PORT': os.environ.get('MYSQL_PORT'),
+        'NAME': config('MYSQL_DB', cast=str),
+        'USER': config('MYSQL_USER', cast=str),
+        'PASSWORD': config('MYSQL_PASS', cast=str),
+        'HOST': config('MYSQL_HOST', cast=str),
+        'PORT': config('MYSQL_PORT', cast=str),
     }
 }
 
