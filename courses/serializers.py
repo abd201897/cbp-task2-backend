@@ -3,9 +3,20 @@ from .models import Module, Course, StudentModuleRegistration
 
 
 class ModuleSerializer(serializers.ModelSerializer):
+    id_registered = serializers.SerializerMethodField(method_name='set_is_registered', allow_null=True, read_only=True)
+
+    def set_is_registered(self, obj):
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            if request.user.is_authenticated and request.user.role:
+                if request.user.role.name == 'STUDENT':
+                    if StudentModuleRegistration.objects.filter(student=request.user, module=obj):
+                        return True
+        return False
+
     class Meta:
         model = Module
-        fields = '__all__'
+        fields = ['name', 'code', 'credit', 'category', 'description', 'availability', 'id_registered']
         extra_kwargs = {
             'course_allowed': {'write_only': True},
         }
@@ -65,9 +76,15 @@ class StudentModuleRegistrationSerializer(serializers.ModelSerializer):
     def get_modules(self, obj):
         if hasattr(obj, 'module'):
             module_ = Module.objects.get(id=obj.module.id)
-            module_serializer = ModuleSerializer(module_)
+            module_serializer = ModuleSerializer(module_, context={'request': self.context.get("request", None)})
             return module_serializer.data
         return []
+
+    def validate_module(self, obj):
+        if obj.availability == "open":
+            return obj
+        raise serializers.ValidationError(detail={"Can not register, because this module is closed."})
+
 
     class Meta:
         model = StudentModuleRegistration
