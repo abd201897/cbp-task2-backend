@@ -20,7 +20,7 @@ def get_courses_list(request):
     paginator.page_size = 10  # Set the number of items per page
     courses = Course.objects.all()
     result_page = paginator.paginate_queryset(courses, request)
-    serializer = CourseSerializer(result_page, many=True)
+    serializer = CourseSerializer(result_page, many=True, context={'request': request})
     return paginator.get_paginated_response(serializer.data)
 
 
@@ -32,7 +32,7 @@ def get_course_modules(request):
         paginator.page_size = 10  # Set the number of items per page
         course_ = Course.objects.filter(id=course_id)
         result_page = paginator.paginate_queryset(course_, request)
-        serializer = CourseSerializer(result_page, many=True)
+        serializer = CourseSerializer(result_page, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)
     else:
         return Response(data={
@@ -67,10 +67,10 @@ def get_module_detail(request):
 @DR_handler.authenticate_rest_call(allowed_methods=['GET'])
 def get_student_module_register(request):
     serialize = None
-    if request.user.role.name == 'STUDENT':
+    if hasattr(request.user.role, 'name') and request.user.role.name == 'STUDENT':
         try:
             student_module_regis = StudentModuleRegistration.objects.filter(student=request.user)
-            serialize = StudentModuleRegistrationSerializer(student_module_regis, many=True)
+            serialize = StudentModuleRegistrationSerializer(student_module_regis, many=True, context={'request': request})
             return Response(data=serialize.data)
         except Exception as ex:
             message = str(serialize.errors) if serialize else str(ex)
@@ -86,10 +86,14 @@ def get_student_module_register(request):
 @DR_handler.authenticate_rest_call(allowed_methods=['POST'])
 def student_module_register(request):
     user = request.user
-    data = json.loads(request.body)
+    module_id = request.GET.get('module_id', None)
     serializer_ = None
-    if user.role.name == 'STUDENT':
+    if hasattr(request.user.role, 'name') and user.role.name == 'STUDENT':
         try:
+            data = {
+                'student': user.id,
+                'module': module_id
+            }
             serializer_ = StudentModuleRegistrationSerializer(data=data, many=False)
             if serializer_.is_valid(raise_exception=True):
                 serializer_.save()
@@ -108,22 +112,22 @@ def student_module_register(request):
         }, status=status.HTTP_401_UNAUTHORIZED)
 
 
-@DR_handler.authenticate_rest_call(allowed_methods=['POST'])
+@DR_handler.authenticate_rest_call(allowed_methods=['DELETE'])
 def student_module_unregister(request):
-    user = request.user
-    id = request.GET.get('id', None)
-    serializer_ = None
-    if user.role.name == 'STUDENT' and type(int(id)) == int:
+    module_id = request.GET.get('module_id', None)
+    if hasattr(request.user.role, 'name') and request.user.role.name == 'STUDENT':
         try:
-            student_register_ = StudentModuleRegistration.objects.filter(id=id)
-            if student_register_:
-                student_register_.delete()
-                # module_model = Module.objects.get(id=serializer_.data.get('module', None)).name
-                return Response(data={
-                    'message': f'Enrolled from module.'
-                })
+            if module_id:
+                student_register_ = StudentModuleRegistration.objects.filter(module_id=module_id)
+                if student_register_:
+                    student_register_.delete()
+                    return Response(data={
+                        'message': f'Un-Register from module.'
+                    })
+            else:
+                raise Exception("`module_id` is required.")
         except Exception as ex:
-            message = str(serializer_.errors) if serializer_ else str(ex)
+            message = str(ex)
             return Response(data={
                 'message': message
             }, status=status.HTTP_400_BAD_REQUEST)

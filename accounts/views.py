@@ -40,22 +40,18 @@ def add_user(request):
 
 @DR_handler.authenticate_rest_call(allowed_methods=['GET'])
 def get_user(request):
-    user_id = request.GET.get('user_id', None)
 
-    if user_id:
-        try:
-            user_ = UserModel.objects.filter(id=user_id)
-        except Exception as ex:
-            return Response(data={
-                'message': 'Invalid User'
-            }, status=HTTP_400_BAD_REQUEST)
-        serializer_ = UserSerializers(user_, many=True)
+    try:
+        user_ = UserModel.objects.filter(id=request.user.id)
+    except Exception as ex:
         return Response(data={
-            'data': serializer_.data
-        }, status=HTTP_200_OK)
+            'message': 'Invalid User'
+        }, status=HTTP_400_BAD_REQUEST)
+
+    serializer_ = UserSerializers(user_, many=True)
     return Response(data={
-        'error': '`user_id` can not be empty parameter!'
-    }, status=HTTP_400_BAD_REQUEST)
+        'data': serializer_.data
+    }, status=HTTP_200_OK)
 
 
 @DR_handler.authenticate_rest_call(allowed_methods=['POST'])
@@ -65,7 +61,7 @@ def update_user(request):
 
     if data:
         user_ = UserModel.objects.filter(username=data.get('username', None)).first()
-        serializer_ = UserSerializers(user_, data=data)
+        serializer_ = UserSerializers(user_, data=data, partial=True)
         if serializer_.is_valid(raise_exception=True):
             serializer_.save()
             return Response(data={
