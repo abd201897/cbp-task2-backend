@@ -45,9 +45,9 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = list(default_headers)
 
 # Acure Blob Access Keys
-AZURE_BLOB_KEY = os.environ['AZURE_BLOB_KEY']
-AZURE_BLOB_STORAGE_ACCOUNT = os.environ['AZURE_BLOB_STORAGE_ACCOUNT']
-AZURE_BLOB_CONTAINER_NAME = os.environ['AZURE_BLOB_CONTAINER_NAME']
+AZURE_BLOB_KEY =  config('AZURE_BLOB_KEY', default='*', cast=str)
+AZURE_BLOB_STORAGE_ACCOUNT = config('AZURE_BLOB_STORAGE_ACCOUNT', default='*', cast=str)
+AZURE_BLOB_CONTAINER_NAME = config('AZURE_BLOB_CONTAINER_NAME', default='*', cast=str) 
 
 # Application definition
 
