@@ -1,11 +1,12 @@
 # Use an official Python runtime as a parent image
 FROM python:3.11
 
+ARG environment
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV environment ${environment}
 
-ENV SECRET_KEY='django-insecure-p6f)an3s*2yq)q--mh8!(o#aq78tfm@#f0o7jjkhc-b1d1ws7z'
 
 # Set the working directory in the container
 WORKDIR /app
@@ -30,12 +31,3 @@ COPY sshd_config /etc/ssh/
 # Expose the port Django runs on
 EXPOSE 80 2222
 ENTRYPOINT [ "./entrypoint.sh" ] 
-
-
-
-# RUN python manage.py makemigrations
-# Run Django application
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
-
-
-#CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:80"]
