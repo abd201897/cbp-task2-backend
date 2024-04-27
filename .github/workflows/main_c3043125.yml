@@ -9,6 +9,7 @@ on:
       - user/jigar
       - user/ehsan
       - user/pinal
+      - feature/pipeline
   workflow_dispatch:
 
 jobs:
@@ -17,6 +18,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
+    - name: Run inline script
+      run: |
+        echo "Hello from inline script!"
+        echo "Current directory: ${{ secrets.DOCKERUSER }}"
+        echo ${{ secrets.DOCKERUSER }} > text
+        echo "List files:"
+        ls -al
+        cat  text
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
