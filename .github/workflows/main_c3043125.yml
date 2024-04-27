@@ -42,7 +42,7 @@ jobs:
         tags: abdullah201897/cbp-task2-backend:${{ github.sha }}
         file: ./Dockerfile
         build-args: |
-          "SENTRY_AUTH_TOKEN=${{ secrets.ENV }}"
+          "environment=${{ secrets.ENV }}"
 
   deploy:
     runs-on: ubuntu-latest
