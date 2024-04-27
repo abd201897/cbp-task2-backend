@@ -198,6 +198,15 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Configure email settings
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', cast=str)  # SMTP server
+EMAIL_PORT = config('EMAIL_PORT', cast=int)  # SMTP port
+# EMAIL_USE_TLS = True  # TLS is required
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', cast=str)  # Your email address
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', cast=str)  # Your password or app-specific password
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', cast=str)  # The default sender email address (must be your email)
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
