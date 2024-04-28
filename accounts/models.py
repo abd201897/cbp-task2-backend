@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from utils.models import Roles
+from django.utils import timezone
 
 
 # Create your models here.
@@ -20,3 +21,15 @@ class User(AbstractUser):
     class Meta:
         db_table = "User"
 
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, db_column='user')
+    token = models.CharField(max_length=6, db_column='token')  # Assuming token is 6 digits
+    expiry_date = models.DateTimeField(db_column='expiry_date')
+
+    def is_expired(self):
+        return timezone.now() > self.expiry_date
+
+    class Meta:
+        db_table = 'PasswordResetToken'
+        ordering = ('-expiry_date',)
