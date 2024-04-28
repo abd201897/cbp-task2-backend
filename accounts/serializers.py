@@ -1,10 +1,9 @@
 import base64
-import os.path
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from rest_framework.exceptions import ParseError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -33,8 +32,15 @@ class UserSerializers(serializers.ModelSerializer):
     image = serializers.CharField(allow_blank=True)
 
     def create(self, validated_data):
-        validated_data.pop("image_type")
-        validated_data.pop("is_image_uploaded")
+        # Decode the base64 image data
+        image_data = validated_data.get('image', None)
+        if image_data:
+            type_format, img_str = image_data.split(';base64,')
+            ext = type_format.split('/')[-1]
+            image_data = ContentFile(base64.b64decode(img_str), name=f"{validated_data['username']}.{ext}")
+
+            validated_data['image'] = image_data
+
         return User_Model.objects.create_user(**validated_data, is_active=True)
 
     def update(self, instance, validated_data):
@@ -55,32 +61,21 @@ class UserSerializers(serializers.ModelSerializer):
         else:
             instance.email = validated_data.get('email')
 
-        if 'image' in validated_data and validated_data['image'] == '':
+        if 'image' in validated_data and (not validated_data['image'] or validated_data['image'] == ''):
             validated_data.pop('image')
         else:
+            # Decode the base64 image data
+            image_data = validated_data.get('image', None)
+            if image_data:
+                type_format, img_str = image_data.split(';base64,')
+                ext = type_format.split('/')[-1]
+                image_data = ContentFile(base64.b64decode(img_str), name=f"{validated_data['username']}.{ext}")
+
+                validated_data['image'] = image_data
             instance.image = validated_data.get('image')
 
-        # if validated_data['is_image_uploaded']:
-        #     instance.image = os.path.join(settings.AZURE_BLOB_URL,
-        #                                   instance.username + "_" + str(instance.id) + '.' + validated_data[
-        #                                       'image_type'])
         instance.save()
         return instance
-
-    def validate(self, attrs):
-        try:
-            if 'image' in attrs and attrs['image'] != "":
-                # Split the base64 string to get the content type and data
-                header, encoded = attrs['image'].split(',', 1)
-
-                decoded_data = base64.b64decode(encoded)
-
-                attrs['image_type'] = header.split(';')[0].split('/')[1]
-                attrs['is_image_uploaded'] = True
-        except Exception as ex:
-            raise serializers.ValidationError(detail='`image` This field is of base64encoded string.')
-
-        return attrs
 
     def to_representation(self, instance):
         data = super(UserSerializers, self).to_representation(instance)
@@ -88,6 +83,9 @@ class UserSerializers(serializers.ModelSerializer):
         if 'password' in data:
             data.pop('password')
         data.pop('date_joined')
+
+        if 'image' in data:
+            data['image'] = f"{settings.MEDIA_URL}{data['image']}"
 
         return data
 

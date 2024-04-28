@@ -13,7 +13,7 @@ class User(AbstractUser):
     address = models.TextField(default='', null=True, verbose_name='Address')
     city = models.CharField(max_length=100, default='', null=True, verbose_name='City')
     country = models.CharField(max_length=100, default='', null=True, verbose_name='Country')
-    image = models.TextField(default='', verbose_name='Profile Picture URL')
+    image = models.ImageField(upload_to='profile_image/', default='', null=True, verbose_name='Profile Picture URL')
 
     def __str__(self):
         return f"{self.get_full_name()} [Username: {self.username}] | [Role: {self.role}]"
