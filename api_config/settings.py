@@ -212,38 +212,29 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', cast=str)  # The default sende
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-if not DEBUG:
-    STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.azure_storage.AzureStorage",
-            "OPTIONS": {
-                "account_name": AZURE_BLOB_STORAGE_ACCOUNT,
-                "account_key": AZURE_BLOB_KEY,
-                "azure_container": os.path.join(AZURE_BLOB_CONTAINER_NAME, 'media'),
-            },
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "account_name": AZURE_BLOB_STORAGE_ACCOUNT,
+            "account_key": AZURE_BLOB_KEY,
+            "azure_container": os.path.join(AZURE_BLOB_CONTAINER_NAME, 'media'),
         },
-        "staticfiles": {
-            "BACKEND": "storages.backends.azure_storage.AzureStorage",
-            "OPTIONS": {
-                "account_name": AZURE_BLOB_STORAGE_ACCOUNT,
-                "account_key": AZURE_BLOB_KEY,
-                "azure_container": os.path.join(AZURE_BLOB_CONTAINER_NAME, 'static'),
-            },
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "account_name": AZURE_BLOB_STORAGE_ACCOUNT,
+            "account_key": AZURE_BLOB_KEY,
+            "azure_container": os.path.join(AZURE_BLOB_CONTAINER_NAME, 'static'),
         },
-    }
+    },
+}
 
-    STATIC_URL = f'https://{AZURE_BLOB_STORAGE_ACCOUNT}.blob.core.windows.net/{AZURE_BLOB_CONTAINER_NAME}/static/'
+STATIC_URL = f'https://{AZURE_BLOB_STORAGE_ACCOUNT}.blob.core.windows.net/{AZURE_BLOB_CONTAINER_NAME}/static/'
 
-    MEDIA_URL = f'https://{AZURE_BLOB_STORAGE_ACCOUNT}.blob.core.windows.net/{AZURE_BLOB_CONTAINER_NAME}/media/'
-else:
-    # local environment
-    SITE_URL = 'http://127.0.0.1:8050{}'
-    STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+MEDIA_URL = f'https://{AZURE_BLOB_STORAGE_ACCOUNT}.blob.core.windows.net/{AZURE_BLOB_CONTAINER_NAME}/media/'
 
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-    MEDIA_URL = SITE_URL.format('/media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

@@ -33,15 +33,17 @@ def add_user(request):
     data = json.loads(request.body)
 
     if data:
-        serializer_ = UserSerializers(data=data, many=False)
-        if serializer_.is_valid(raise_exception=True):
-            serializer_.save()
+        try:
+            serializer_ = UserSerializers(data=data, many=False)
+            if serializer_.is_valid(raise_exception=True):
+                serializer_.save()
+                return Response(data={
+                    'message': "Student Registered!"
+                }, status=HTTP_200_OK)
+        except Exception as ex:
             return Response(data={
-                'message': "Student Registered!"
-            }, status=HTTP_200_OK)
-    return Response(data={
-        'error': serializer_.errors
-    }, status=HTTP_400_BAD_REQUEST)
+                'error': serializer_.errors
+            }, status=HTTP_400_BAD_REQUEST)
 
 
 @DR_handler.authenticate_rest_call(allowed_methods=['GET'])

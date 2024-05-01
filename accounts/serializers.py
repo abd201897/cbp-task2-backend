@@ -6,7 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from  utils.models import Roles
 User_Model = get_user_model()
 
 
@@ -33,6 +33,9 @@ class UserSerializers(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # Decode the base64 image data
+        role_ = Roles.objects.filter(name='STUDENT')
+        validated_data['role'] = role_.first()
+
         image_data = validated_data.get('image', None)
         if image_data:
             type_format, img_str = image_data.split(';base64,')
@@ -84,7 +87,7 @@ class UserSerializers(serializers.ModelSerializer):
             data.pop('password')
         data.pop('date_joined')
 
-        if 'image' in data:
+        if 'image' in data and data['image'] is not None and data['image'] != "":
             data['image'] = f"{settings.MEDIA_URL}{data['image']}"
 
         return data
