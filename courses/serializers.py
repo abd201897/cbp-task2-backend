@@ -16,7 +16,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['name', 'code', 'credit', 'category', 'description', 'availability', 'id_registered']
+        fields = ['id', 'name', 'code', 'credit', 'category', 'description', 'availability', 'id_registered']
         extra_kwargs = {
             'course_allowed': {'write_only': True},
         }
