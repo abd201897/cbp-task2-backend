@@ -43,6 +43,7 @@ else:
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = list(default_headers)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Acure Blob Access Keys
 AZURE_BLOB_KEY =  config('AZURE_BLOB_KEY', default='*', cast=str)
