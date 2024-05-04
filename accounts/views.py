@@ -96,10 +96,12 @@ def send_reset_password(request):
     PasswordResetToken.objects.create(user=user, token=token, expiry_date=expiry_date)
 
     # Send reset password email
-    send_email("Token", f"{token}", [user.email])
+    if send_email("Token", f"{token}", user.email):
 
-    return Response({'message': "Reset password email sent. \nif doen't find you email in you inbox, "
-                                "please check you spam box."}, status=HTTP_200_OK)
+        return Response({'message': "Reset password email sent. \nif doen't find you email in you inbox, "
+                                    "please check you spam box."}, status=HTTP_200_OK)
+    else:
+        return Response({'message': 'Email Token can not sent. Server Error.'}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @DR_handler.public_rest_call(allowed_methods=['POST'])
